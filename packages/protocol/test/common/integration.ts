@@ -27,80 +27,27 @@ enum VoteValue {
   Yes,
 }
 
-async function getGroups(election: ElectionInstance) {
-  const [lst1, lst2] = await election.getTotalVotesForEligibleValidatorGroups()
-  return zip(
-    (address, value) => {
-      return { address, value }
-    },
-    lst1,
-    lst2
-  )
-}
-
-async function slashingOfGroups(
-  account: string,
-  penalty: BigNumber,
-  lockedGold: LockedGoldInstance,
-  election: ElectionInstance
-) {
-  // first check how much voting gold has to be slashed
-  const nonVoting = await lockedGold.getAccountNonvotingLockedGold(account)
-  if (penalty.isLessThan(nonVoting)) {
-    return []
-  }
-  let difference = penalty.minus(nonVoting)
-  // find voted groups
-  const groups = await election.getGroupsVotedForByAccount(account)
-  const res = []
-  //
-  for (let i = groups.length - 1; i >= 0; i++) {
-    const group = groups[i]
-    const totalVotes = await election.getTotalVotesForGroup(group)
-    const votes = await election.getTotalVotesForGroupByAccount(group, account)
-    const slashedVotes = votes.lt(difference) ? votes : difference
-    res.push({ address: group, value: totalVotes.minus(slashedVotes), index: i })
-    difference = difference.minus(slashedVotes)
-    if (difference.eq(new BigNumber(0))) break
-  }
-  return res
-}
-
-async function findLessersAndGreaters(
-  account: string,
-  penalty: BigNumber,
-  lockedGold: LockedGoldInstance,
-  election: ElectionInstance
-) {
-  const groups = await getGroups(election)
-  const changed = await slashingOfGroups(account, penalty, lockedGold, election)
-  const changes = linkedListChanges(groups, changed)
-  return { ...changes, indices: changed.map((a) => a.index) }
-}
-
 contract('Integration: Governance slashing', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
+  let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
-  let election: ElectionInstance
   let governance: GovernanceInstance
   let governanceSlasher: GovernanceSlasherInstance
   let proposalTransactions: any
-  let value: BigNumber
-  let valueOfSlashed: BigNumber
-  const penalty = new BigNumber('100')
-  const slashedAccount = accounts[9]
+  const value = new BigNumber('1000000000000000000')
 
   before(async () => {
+    accountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
-    election = await getDeployedProxiedContract('Election', artifacts)
-    // @ts-ignore
-    await lockedGold.lock({ value: '10000000000000000000000000' })
-
     governance = await getDeployedProxiedContract('Governance', artifacts)
     governanceSlasher = await getDeployedProxiedContract('GovernanceSlasher', artifacts)
-    value = await lockedGold.getAccountTotalLockedGold(accounts[0])
-
+    await accountsInstance.createAccount()
+    await accountsInstance.createAccount({ from: accounts[1] })
+    // @ts-ignore
+    await lockedGold.lock({ value })
+    // @ts-ignore
+    await lockedGold.lock({ value, from: accounts[1] })
     proposalTransactions = [
       {
         value: 0,
@@ -108,7 +55,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
         data: Buffer.from(
           stripHexEncoding(
             // @ts-ignore
-            governanceSlasher.contract.methods.approveSlashing(slashedAccount, 100).encodeABI()
+            governanceSlasher.contract.methods.approveSlashing(accounts[1], 100).encodeABI()
           ),
           'hex'
         ),
@@ -174,32 +121,22 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
 
     it('should execute the proposal', async () => {
-      assertEqualBN(await governanceSlasher.getApprovedSlashing(slashedAccount), penalty)
+      assert.equal((await governanceSlasher.getApprovedSlashing(accounts[1])).toNumber(), 100)
     })
   })
 
   describe('When performing slashing', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
-      valueOfSlashed = await lockedGold.getAccountTotalLockedGold(slashedAccount)
-      const { lessers, greaters, indices } = await findLessersAndGreaters(
-        slashedAccount,
-        penalty,
-        lockedGold,
-        election
-      )
-      await governanceSlasher.slash(slashedAccount, lessers, greaters, indices)
+      await governanceSlasher.slash(accounts[1], [], [], [])
     })
 
     it('should set approved slashing to zero', async () => {
-      assert.equal((await governanceSlasher.getApprovedSlashing(slashedAccount)).toNumber(), 0)
+      assert.equal((await governanceSlasher.getApprovedSlashing(accounts[1])).toNumber(), 0)
     })
 
     it('should slash the account', async () => {
-      assertEqualBN(
-        await lockedGold.getAccountTotalLockedGold(slashedAccount),
-        valueOfSlashed.minus(penalty)
-      )
+      // slashing not yet implemented in LockedGold
     })
   })
 })
