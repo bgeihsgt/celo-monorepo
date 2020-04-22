@@ -12,33 +12,36 @@ module "celo_vpc" {
 module "celo_bastion_az1" {
   source = "./modules/bastion"
 
-  subnet_id         = module.celo_vpc.subnet_ids.az1.public
-  security_group_id = module.celo_vpc.security_group_ids.bastion
-  key_pair_name     = var.key_pair_name
-  name              = "celo-bastion-az1"
-  instance_type     = var.instance_types.bastion
+  subnet_id            = module.celo_vpc.subnet_ids.az1.public
+  security_group_id    = module.celo_vpc.security_group_ids.bastion
+  key_pair_name        = var.key_pair_name
+  name                 = "celo-bastion-az1"
+  instance_type        = var.instance_types.bastion
+  iam_instance_profile = var.iam_instance_profiles.bastion
 }
 
 module "celo_bastion_az2" {
   source = "./modules/bastion"
 
-  subnet_id         = module.celo_vpc.subnet_ids.az2.public
-  security_group_id = module.celo_vpc.security_group_ids.bastion
-  key_pair_name     = var.key_pair_name
-  name              = "celo-bastion-az2"
-  instance_type     = var.instance_types.bastion
+  subnet_id            = module.celo_vpc.subnet_ids.az2.public
+  security_group_id    = module.celo_vpc.security_group_ids.bastion
+  key_pair_name        = var.key_pair_name
+  name                 = "celo-bastion-az2"
+  instance_type        = var.instance_types.bastion
+  iam_instance_profile = var.iam_instance_profiles.bastion
 }
 
 module "celo_proxy_az1" {
   source = "./modules/proxy"
 
-  subnet_id         = module.celo_vpc.subnet_ids.az1.public
-  security_group_id = module.celo_vpc.security_group_ids.proxy
-  key_pair_name     = var.key_pair_name
-  instance_type     = var.instance_types.proxy
-  celo_image        = var.celo_image
-  celo_network_id   = var.celo_network_id
-  ethstats_host     = var.ethstats_host
+  subnet_id            = module.celo_vpc.subnet_ids.az1.public
+  security_group_id    = module.celo_vpc.security_group_ids.proxy
+  key_pair_name        = var.key_pair_name
+  instance_type        = var.instance_types.proxy
+  celo_image           = var.celo_image
+  celo_network_id      = var.celo_network_id
+  ethstats_host        = var.ethstats_host
+  iam_instance_profile = var.iam_instance_profiles.proxy
 
   proxies = var.proxies.az1
 }
@@ -46,13 +49,14 @@ module "celo_proxy_az1" {
 module "celo_proxy_az2" {
   source = "./modules/proxy"
 
-  subnet_id         = module.celo_vpc.subnet_ids.az2.public
-  security_group_id = module.celo_vpc.security_group_ids.proxy
-  key_pair_name     = var.key_pair_name
-  instance_type     = var.instance_types.proxy
-  celo_image        = var.celo_image
-  celo_network_id   = var.celo_network_id
-  ethstats_host     = var.ethstats_host
+  subnet_id            = module.celo_vpc.subnet_ids.az2.public
+  security_group_id    = module.celo_vpc.security_group_ids.proxy
+  key_pair_name        = var.key_pair_name
+  instance_type        = var.instance_types.proxy
+  celo_image           = var.celo_image
+  celo_network_id      = var.celo_network_id
+  ethstats_host        = var.ethstats_host
+  iam_instance_profile = var.iam_instance_profiles.proxy
 
   proxies = var.proxies.az2
 }
@@ -93,13 +97,14 @@ locals {
 module "celo_validator_az1" {
   source = "./modules/validator"
 
-  subnet_id         = module.celo_vpc.subnet_ids.az1.private
-  security_group_id = module.celo_vpc.security_group_ids.validator
-  key_pair_name     = var.key_pair_name
-  instance_type     = var.instance_types.validator
-  celo_image        = var.celo_image
-  celo_network_id   = var.celo_network_id
-  ethstats_host     = var.ethstats_host
+  subnet_id            = module.celo_vpc.subnet_ids.az1.private
+  security_group_id    = module.celo_vpc.security_group_ids.validator
+  key_pair_name        = var.key_pair_name
+  instance_type        = var.instance_types.validator
+  celo_image           = var.celo_image
+  celo_network_id      = var.celo_network_id
+  ethstats_host        = var.ethstats_host
+  iam_instance_profile = var.iam_instance_profiles.validator
 
   validators = local.validator_params.az1
 }
@@ -107,13 +112,14 @@ module "celo_validator_az1" {
 module "celo_validator_az2" {
   source = "./modules/validator"
 
-  subnet_id         = module.celo_vpc.subnet_ids.az2.private
-  security_group_id = module.celo_vpc.security_group_ids.validator
-  key_pair_name     = var.key_pair_name
-  instance_type     = var.instance_types.validator
-  celo_image        = var.celo_image
-  celo_network_id   = var.celo_network_id
-  ethstats_host     = var.ethstats_host
+  subnet_id            = module.celo_vpc.subnet_ids.az2.private
+  security_group_id    = module.celo_vpc.security_group_ids.validator
+  key_pair_name        = var.key_pair_name
+  instance_type        = var.instance_types.validator
+  celo_image           = var.celo_image
+  celo_network_id      = var.celo_network_id
+  ethstats_host        = var.ethstats_host
+  iam_instance_profile = var.iam_instance_profiles.validator
 
   validators = local.validator_params.az2
 }
@@ -171,6 +177,7 @@ module "celo_attestation_service_az1" {
   twilio_account_sid           = var.twilio_account_sid
   twilio_blacklist             = var.twilio_blacklist
   twilio_auth_token            = var.twilio_auth_token
+  iam_instance_profile         = var.iam_instance_profiles.attestation_service
 
   attestation_services = var.attestation_services.az1
 }
@@ -190,6 +197,7 @@ module "celo_attestation_service_az2" {
   twilio_account_sid           = var.twilio_account_sid
   twilio_blacklist             = var.twilio_blacklist
   twilio_auth_token            = var.twilio_auth_token
+  iam_instance_profile         = var.iam_instance_profiles.attestation_service
 
   attestation_services = var.attestation_services.az2
 }

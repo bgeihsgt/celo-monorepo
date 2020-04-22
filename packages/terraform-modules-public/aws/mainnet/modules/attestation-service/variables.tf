@@ -67,3 +67,8 @@ variable attestation_services {
     attestation_signer_private_key_password      = string
   }))
 }
+
+variable iam_instance_profile {
+  type    = string
+  default = null
+}

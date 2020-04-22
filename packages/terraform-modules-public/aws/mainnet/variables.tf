@@ -35,6 +35,18 @@ variable instance_types {
   }
 }
 
+variable iam_instance_profiles {
+  description = "Optional IAM instances profile names for each component. For example, a profile that gives CloudWatch agent permissions"
+  type        = map(string)
+
+  default = {
+    bastion             = null
+    proxy               = null
+    validator           = null
+    attestation_service = null
+  }
+}
+
 variable key_pair_name {
   type        = string
   description = "AWS Key Pair name for SSH access"

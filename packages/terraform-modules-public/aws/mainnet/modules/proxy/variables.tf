@@ -51,3 +51,8 @@ variable proxies {
   }))
   description = "Map of proxy configurations."
 }
+
+variable iam_instance_profile {
+  type    = string
+  default = null
+}
