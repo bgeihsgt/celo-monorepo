@@ -34,14 +34,16 @@ module "celo_bastion_az2" {
 module "celo_proxy_az1" {
   source = "./modules/proxy"
 
-  subnet_id            = module.celo_vpc.subnet_ids.az1.public
-  security_group_id    = module.celo_vpc.security_group_ids.proxy
-  key_pair_name        = var.key_pair_name
-  instance_type        = var.instance_types.proxy
-  celo_image           = var.celo_image
-  celo_network_id      = var.celo_network_id
-  ethstats_host        = var.ethstats_host
-  iam_instance_profile = var.iam_instance_profiles.proxy
+  subnet_id                                = module.celo_vpc.subnet_ids.az1.public
+  security_group_id                        = module.celo_vpc.security_group_ids.proxy
+  key_pair_name                            = var.key_pair_name
+  instance_type                            = var.instance_types.proxy
+  celo_image                               = var.celo_image
+  celo_network_id                          = var.celo_network_id
+  ethstats_host                            = var.ethstats_host
+  iam_instance_profile                     = var.iam_instance_profiles.proxy
+  cloudwatch_log_group_name                = var.cloudwatch_log_group_names.proxy
+  cloudwatch_collect_disk_and_memory_usage = var.cloudwatch_collect_disk_and_memory_usage
 
   proxies = var.proxies.az1
 }
@@ -49,14 +51,16 @@ module "celo_proxy_az1" {
 module "celo_proxy_az2" {
   source = "./modules/proxy"
 
-  subnet_id            = module.celo_vpc.subnet_ids.az2.public
-  security_group_id    = module.celo_vpc.security_group_ids.proxy
-  key_pair_name        = var.key_pair_name
-  instance_type        = var.instance_types.proxy
-  celo_image           = var.celo_image
-  celo_network_id      = var.celo_network_id
-  ethstats_host        = var.ethstats_host
-  iam_instance_profile = var.iam_instance_profiles.proxy
+  subnet_id                                = module.celo_vpc.subnet_ids.az2.public
+  security_group_id                        = module.celo_vpc.security_group_ids.proxy
+  key_pair_name                            = var.key_pair_name
+  instance_type                            = var.instance_types.proxy
+  celo_image                               = var.celo_image
+  celo_network_id                          = var.celo_network_id
+  ethstats_host                            = var.ethstats_host
+  iam_instance_profile                     = var.iam_instance_profiles.proxy
+  cloudwatch_log_group_name                = var.cloudwatch_log_group_names.proxy
+  cloudwatch_collect_disk_and_memory_usage = var.cloudwatch_collect_disk_and_memory_usage
 
   proxies = var.proxies.az2
 }
@@ -97,14 +101,16 @@ locals {
 module "celo_validator_az1" {
   source = "./modules/validator"
 
-  subnet_id            = module.celo_vpc.subnet_ids.az1.private
-  security_group_id    = module.celo_vpc.security_group_ids.validator
-  key_pair_name        = var.key_pair_name
-  instance_type        = var.instance_types.validator
-  celo_image           = var.celo_image
-  celo_network_id      = var.celo_network_id
-  ethstats_host        = var.ethstats_host
-  iam_instance_profile = var.iam_instance_profiles.validator
+  subnet_id                                = module.celo_vpc.subnet_ids.az1.private
+  security_group_id                        = module.celo_vpc.security_group_ids.validator
+  key_pair_name                            = var.key_pair_name
+  instance_type                            = var.instance_types.validator
+  celo_image                               = var.celo_image
+  celo_network_id                          = var.celo_network_id
+  ethstats_host                            = var.ethstats_host
+  iam_instance_profile                     = var.iam_instance_profiles.validator
+  cloudwatch_log_group_name                = var.cloudwatch_log_group_names.validator
+  cloudwatch_collect_disk_and_memory_usage = var.cloudwatch_collect_disk_and_memory_usage
 
   validators = local.validator_params.az1
 }
@@ -112,14 +118,16 @@ module "celo_validator_az1" {
 module "celo_validator_az2" {
   source = "./modules/validator"
 
-  subnet_id            = module.celo_vpc.subnet_ids.az2.private
-  security_group_id    = module.celo_vpc.security_group_ids.validator
-  key_pair_name        = var.key_pair_name
-  instance_type        = var.instance_types.validator
-  celo_image           = var.celo_image
-  celo_network_id      = var.celo_network_id
-  ethstats_host        = var.ethstats_host
-  iam_instance_profile = var.iam_instance_profiles.validator
+  subnet_id                                = module.celo_vpc.subnet_ids.az2.private
+  security_group_id                        = module.celo_vpc.security_group_ids.validator
+  key_pair_name                            = var.key_pair_name
+  instance_type                            = var.instance_types.validator
+  celo_image                               = var.celo_image
+  celo_network_id                          = var.celo_network_id
+  ethstats_host                            = var.ethstats_host
+  iam_instance_profile                     = var.iam_instance_profiles.validator
+  cloudwatch_log_group_name                = var.cloudwatch_log_group_names.validator
+  cloudwatch_collect_disk_and_memory_usage = var.cloudwatch_collect_disk_and_memory_usage
 
   validators = local.validator_params.az2
 }
@@ -165,19 +173,22 @@ locals {
 module "celo_attestation_service_az1" {
   source = "./modules/attestation-service"
 
-  subnet_id                    = module.celo_vpc.subnet_ids.az1.public
-  security_group_id            = module.celo_vpc.security_group_ids.attestation_service
-  key_pair_name                = var.key_pair_name
-  instance_type                = var.instance_types.attestation_service
-  celo_image                   = var.celo_image
-  celo_network_id              = var.celo_network_id
-  celo_image_attestation       = var.celo_image_attestation
-  database_url                 = local.attestation_db_url
-  twilio_messaging_service_sid = var.twilio_messaging_service_sid
-  twilio_account_sid           = var.twilio_account_sid
-  twilio_blacklist             = var.twilio_blacklist
-  twilio_auth_token            = var.twilio_auth_token
-  iam_instance_profile         = var.iam_instance_profiles.attestation_service
+  subnet_id                                     = module.celo_vpc.subnet_ids.az1.public
+  security_group_id                             = module.celo_vpc.security_group_ids.attestation_service
+  key_pair_name                                 = var.key_pair_name
+  instance_type                                 = var.instance_types.attestation_service
+  celo_image                                    = var.celo_image
+  celo_network_id                               = var.celo_network_id
+  celo_image_attestation                        = var.celo_image_attestation
+  database_url                                  = local.attestation_db_url
+  twilio_messaging_service_sid                  = var.twilio_messaging_service_sid
+  twilio_account_sid                            = var.twilio_account_sid
+  twilio_blacklist                              = var.twilio_blacklist
+  twilio_auth_token                             = var.twilio_auth_token
+  iam_instance_profile                          = var.iam_instance_profiles.attestation_service
+  cloudwatch_attestation_node_log_group_name    = var.cloudwatch_log_group_names.attestation_node
+  cloudwatch_attestation_service_log_group_name = var.cloudwatch_log_group_names.attestation_service
+  cloudwatch_collect_disk_and_memory_usage      = var.cloudwatch_collect_disk_and_memory_usage
 
   attestation_services = var.attestation_services.az1
 }
@@ -185,19 +196,22 @@ module "celo_attestation_service_az1" {
 module "celo_attestation_service_az2" {
   source = "./modules/attestation-service"
 
-  subnet_id                    = module.celo_vpc.subnet_ids.az2.public
-  security_group_id            = module.celo_vpc.security_group_ids.attestation_service
-  key_pair_name                = var.key_pair_name
-  instance_type                = var.instance_types.attestation_service
-  celo_image                   = var.celo_image
-  celo_network_id              = var.celo_network_id
-  celo_image_attestation       = var.celo_image_attestation
-  database_url                 = local.attestation_db_url
-  twilio_messaging_service_sid = var.twilio_messaging_service_sid
-  twilio_account_sid           = var.twilio_account_sid
-  twilio_blacklist             = var.twilio_blacklist
-  twilio_auth_token            = var.twilio_auth_token
-  iam_instance_profile         = var.iam_instance_profiles.attestation_service
+  subnet_id                                     = module.celo_vpc.subnet_ids.az2.public
+  security_group_id                             = module.celo_vpc.security_group_ids.attestation_service
+  key_pair_name                                 = var.key_pair_name
+  instance_type                                 = var.instance_types.attestation_service
+  celo_image                                    = var.celo_image
+  celo_network_id                               = var.celo_network_id
+  celo_image_attestation                        = var.celo_image_attestation
+  database_url                                  = local.attestation_db_url
+  twilio_messaging_service_sid                  = var.twilio_messaging_service_sid
+  twilio_account_sid                            = var.twilio_account_sid
+  twilio_blacklist                              = var.twilio_blacklist
+  twilio_auth_token                             = var.twilio_auth_token
+  iam_instance_profile                          = var.iam_instance_profiles.attestation_service
+  cloudwatch_attestation_node_log_group_name    = var.cloudwatch_log_group_names.attestation_node
+  cloudwatch_attestation_service_log_group_name = var.cloudwatch_log_group_names.attestation_service
+  cloudwatch_collect_disk_and_memory_usage      = var.cloudwatch_collect_disk_and_memory_usage
 
   attestation_services = var.attestation_services.az2
 }

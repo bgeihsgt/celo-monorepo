@@ -41,9 +41,9 @@ variable ethstats_host {
 
 variable proxies {
   type = map(object({
-    validator_name           = string
-    validator_signer_address = string
-    proxy_address            = string
+    validator_name                  = string
+    validator_signer_address        = string
+    proxy_address                   = string
     proxy_private_key_filename      = string
     proxy_private_key_file_contents = string
     proxy_private_key_password      = string
