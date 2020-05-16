@@ -10,7 +10,6 @@ resource "aws_instance" "attestation_service" {
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [var.security_group_id]
   key_name                    = var.key_pair_name
-  associate_public_ip_address = true
   iam_instance_profile        = var.iam_instance_profile
 
   root_block_device {
@@ -55,4 +54,11 @@ resource "aws_instance" "attestation_service" {
       user_data
     ]
   }
+}
+
+resource "aws_eip" "attestation_service" {
+  for_each = var.attestation_services
+
+  instance = aws_instance.attestation_service[each.key].id
+  vpc      = true
 }
