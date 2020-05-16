@@ -42,4 +42,11 @@ resource "aws_instance" "celo_proxy" {
   tags = {
     Name = "celo-proxy-${each.value.validator_name}"
   }
+
+  lifecycle {
+    ignore_changes = [
+      ami,
+      user_data
+    ]
+  }
 }

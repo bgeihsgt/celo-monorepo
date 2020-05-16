@@ -42,4 +42,11 @@ resource "aws_instance" "celo_validator" {
   tags = {
     Name = "celo-validator-${each.value.name}"
   }
+
+  lifecycle {
+    ignore_changes = [
+      ami,
+      user_data
+    ]
+  }
 }
