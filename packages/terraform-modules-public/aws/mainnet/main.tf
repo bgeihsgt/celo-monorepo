@@ -141,11 +141,13 @@ resource "random_password" "password" {
 }
 
 resource "aws_db_subnet_group" "attestation" {
+  count      = (length(var.attestation_services.az1) > 0 || length(var.attestation_services.az2) > 0) ? 1 : 0
   name       = "celo-db-subnet-group"
   subnet_ids = [module.celo_vpc.subnet_ids.az1.private, module.celo_vpc.subnet_ids.az2.private]
 }
 
 resource "aws_db_instance" "attestation" {
+  count                  = (length(var.attestation_services.az1) > 0 || length(var.attestation_services.az2) > 0) ? 1 : 0
   identifier             = "celo-attestation-db"
   allocated_storage      = 32
   storage_type           = "gp2"
@@ -156,18 +158,18 @@ resource "aws_db_instance" "attestation" {
   username               = "attestation"
   password               = random_password.password.result
   multi_az               = true
-  db_subnet_group_name   = aws_db_subnet_group.attestation.name
+  db_subnet_group_name   = aws_db_subnet_group.attestation[0].name
   vpc_security_group_ids = [module.celo_vpc.security_group_ids.attestation_db]
   skip_final_snapshot    = true
 }
 
 locals {
-  attestation_db_url = format("postgresql://%s:%s@%s/%s",
-    aws_db_instance.attestation.username,
-    aws_db_instance.attestation.password,
-    aws_db_instance.attestation.endpoint,
-    aws_db_instance.attestation.name
-  )
+  attestation_db_url = length(aws_db_instance.attestation) > 0 ? format("postgresql://%s:%s@%s/%s",
+    aws_db_instance.attestation[0].username,
+    aws_db_instance.attestation[0].password,
+    aws_db_instance.attestation[0].endpoint,
+    aws_db_instance.attestation[0].name
+  ) : ""
 }
 
 module "celo_attestation_service_az1" {
