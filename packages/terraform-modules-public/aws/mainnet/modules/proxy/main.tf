@@ -10,7 +10,6 @@ resource "aws_instance" "celo_proxy" {
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [var.security_group_id]
   key_name                    = var.key_pair_name
-  associate_public_ip_address = true
   iam_instance_profile        = var.iam_instance_profile
 
   root_block_device {
@@ -49,4 +48,11 @@ resource "aws_instance" "celo_proxy" {
       user_data
     ]
   }
+}
+
+resource "aws_eip" "celo_proxy" {
+  for_each = var.proxies
+
+  instance = aws_instance.celo_proxy[each.key].id
+  vpc      = true
 }
