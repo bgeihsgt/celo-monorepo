@@ -186,3 +186,9 @@ variable attestation_services {
     }))
   })
 }
+
+variable chaindata_archive_url {
+  description = "Optional S3 url of gzip archives that contain chaindata, lightchaindata, and lightestchaindata folders. When set, validators and proxies will download this archive to seed chaindata."
+  type        = string
+  default     = ""
+}
